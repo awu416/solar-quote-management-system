@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ customer.first_name }} {{ customer.last_name }}</h1>
+{% if delete_error == "quotes" %}
+    <p>
+        This customer cannot be deleted because they have existing quotes.
+    </p>
+{% endif %}
+
+<h2>Customer Information</h2>
+
+<p>
+    <strong>Customer ID:</strong>
+    {{ customer.id }}
+</p>
+
+<p>
+    <strong>Email:</strong>
+    {{ customer.email }}
+</p>
+
+<p>
+    <strong>Phone:</strong>
+    {{ customer.phone }}
+</p>
+
+<h2>Quotes</h2>
+
+{% if customer.quotes %}
+    <ul>
+        {% for quote in customer.quotes %}
+            <li>
+                Quote #{{ quote.id }}
+                — {{ quote.system_size }} kW
+                — Status: {{ quote.status }}
+                — Total Price:
+                {% if quote.total_price is not none %}
+                    ${{ quote.total_price }}
+                {% else %}
+                    Not set
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>This customer has no quotes.</p>
+{% endif %}
+
+<p>
+    <a href="{{ url_for('customers.customer_edit', customer_id=customer.id) }}">
+        Edit Customer
+    </a>
+</p>
+<form
+    method="POST"
+    action="{{ url_for('customers.customer_delete', customer_id=customer.id) }}"
+>
+    <button type="submit">
+        Delete Customer
+    </button>
+</form>
+<p>
+    <a href="{{ url_for('customers.customer_list') }}">
+        Back to Customers
+    </a>
+</p>
+{% endblock %}

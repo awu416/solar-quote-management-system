@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Customers</h1>
+
+<p>
+    <a href="{{ url_for('customers.customer_create') }}">
+        Create Customer
+    </a>
+</p>
+
+{% if customers %}
+    <ul>
+        {% for customer in customers %}
+            <li>
+                <a href="{{ url_for('customers.customer_detail', customer_id=customer.id) }}">
+                    {{ customer.first_name }}
+                    {{ customer.last_name }}
+                </a>
+
+                — {{ customer.email }}
+                — {{ customer.phone }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No customers found.</p>
+{% endif %}
+{% endblock %}
