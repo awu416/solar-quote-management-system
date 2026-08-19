@@ -1,4 +1,5 @@
 from flask import abort, redirect, render_template, request, url_for
+from flask_login import login_required
 from sqlalchemy.exc import IntegrityError
 
 from app.blueprints.customers import customers_bp
@@ -7,6 +8,7 @@ from app.models.customer import Customer
 
 
 @customers_bp.route("/")
+@login_required
 def customer_list():
     customers = db.session.execute(
         db.select(Customer).order_by(Customer.id)
@@ -19,6 +21,7 @@ def customer_list():
 
 
 @customers_bp.route("/<int:customer_id>")
+@login_required
 def customer_detail(customer_id):
     customer = db.session.get(Customer, customer_id)
 
@@ -35,6 +38,7 @@ def customer_detail(customer_id):
 
 
 @customers_bp.route("/create", methods=["GET", "POST"])
+@login_required
 def customer_create():
     error = None
 
@@ -80,6 +84,7 @@ def customer_create():
         error=error
     )
 @customers_bp.route("/<int:customer_id>/edit", methods=["GET", "POST"])
+@login_required
 def customer_edit(customer_id):
     customer = db.session.get(Customer, customer_id)
 
@@ -127,6 +132,7 @@ def customer_edit(customer_id):
         error=error
     )
 @customers_bp.route("/<int:customer_id>/delete", methods=["POST"])
+@login_required
 def customer_delete(customer_id):
     customer = db.session.get(Customer, customer_id)
 

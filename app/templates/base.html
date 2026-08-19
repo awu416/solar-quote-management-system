@@ -8,6 +8,30 @@
 </head>
 <body>
 
+    <nav>
+        <a href="{{ url_for('main.home') }}">Home</a>
+
+        {% if current_user.is_authenticated %}
+            <span>
+                Logged in as {{ current_user.email }}
+            </span>
+
+            <form
+                method="POST"
+                action="{{ url_for('auth.logout') }}"
+                style="display: inline;"
+            >
+                <button type="submit">
+                    Logout
+                </button>
+            </form>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">
+                Login
+            </a>
+        {% endif %}
+    </nav>
+
     {% block content %}
     {% endblock %}
 
