@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Create Product{% endblock %}
+
+{% block content %}
+<h1>Create Product</h1>
+
+{% if errors %}
+    <ul>
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form method="POST">
+    <p>
+        <label for="name">Name</label><br>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ form_data.get('name', '') if form_data else '' }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="category">Category</label><br>
+
+        <select id="category" name="category" required>
+            <option value="">Select category</option>
+
+            <option
+                value="panel"
+                {% if form_data and form_data.get('category') == 'panel' %}
+                    selected
+                {% endif %}
+            >
+                Solar Panel
+            </option>
+
+            <option
+                value="inverter"
+                {% if form_data and form_data.get('category') == 'inverter' %}
+                    selected
+                {% endif %}
+            >
+                Inverter
+            </option>
+
+            <option
+                value="battery"
+                {% if form_data and form_data.get('category') == 'battery' %}
+                    selected
+                {% endif %}
+            >
+                Battery
+            </option>
+        </select>
+    </p>
+
+    <p>
+        <label for="brand">Brand</label><br>
+        <input
+            type="text"
+            id="brand"
+            name="brand"
+            value="{{ form_data.get('brand', '') if form_data else '' }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="model">Model</label><br>
+        <input
+            type="text"
+            id="model"
+            name="model"
+            value="{{ form_data.get('model', '') if form_data else '' }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="unit_price">Unit Price</label><br>
+        <input
+            type="number"
+            id="unit_price"
+            name="unit_price"
+            min="0"
+            step="0.01"
+            value="{{ form_data.get('unit_price', '') if form_data else '' }}"
+            required
+        >
+    </p>
+
+    <button type="submit">Create Product</button>
+</form>
+
+<p>
+    <a href="{{ url_for('products.list_products') }}">
+        Back to Products
+    </a>
+</p>
+{% endblock %}

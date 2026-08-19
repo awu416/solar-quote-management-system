@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<h1>Product Details</h1>
+
+<p>
+    <strong>Name:</strong>
+    {{ product.name }}
+</p>
+
+<p>
+    <strong>Category:</strong>
+    {{ product.category }}
+</p>
+
+<p>
+    <strong>Brand:</strong>
+    {{ product.brand }}
+</p>
+
+<p>
+    <strong>Model:</strong>
+    {{ product.model }}
+</p>
+
+<p>
+    <strong>Unit Price:</strong>
+    ${{ "%.2f"|format(product.unit_price) }}
+</p>
+
+<p>
+    <strong>Status:</strong>
+
+    {% if product.is_active %}
+        Active
+    {% else %}
+        Inactive
+    {% endif %}
+</p>
+
+<p>
+    <a href="{{ url_for('products.edit_product', product_id=product.id) }}">
+        Edit Product
+    </a>
+</p>
+
+{% if product.is_active %}
+    <form
+        method="POST"
+        action="{{ url_for('products.deactivate_product', product_id=product.id) }}"
+    >
+        <button type="submit">
+            Deactivate Product
+        </button>
+    </form>
+{% else %}
+    <form
+        method="POST"
+        action="{{ url_for('products.activate_product', product_id=product.id) }}"
+    >
+        <button type="submit">
+            Reactivate Product
+        </button>
+    </form>
+{% endif %}
+
+<p>
+    <a href="{{ url_for('products.list_products') }}">
+        Back to Products
+    </a>
+</p>
+{% endblock %}
