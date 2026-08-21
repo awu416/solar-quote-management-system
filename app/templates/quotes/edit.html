@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Quote {{ quote.id }}{% endblock %}
+
+{% block content %}
+
+<h1>Edit Quote #{{ quote.id }}</h1>
+
+{% if errors %}
+    <div>
+        <h3>Please fix the following:</h3>
+
+        <ul>
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<form method="POST">
+
+    <h2>Customer</h2>
+
+    <p>
+        <label for="customer_id">
+            Customer
+        </label>
+
+        <select
+            id="customer_id"
+            name="customer_id"
+            required
+        >
+            {% for customer in customers %}
+                {% set selected_customer_id =
+                    form_data.get(
+                        "customer_id",
+                        quote.customer_id|string
+                    )
+                %}
+
+                <option
+                    value="{{ customer.id }}"
+                    {% if selected_customer_id == customer.id|string %}
+                        selected
+                    {% endif %}
+                >
+                    {{ customer.first_name }}
+                    {{ customer.last_name }}
+                    — {{ customer.email }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <h2>System Information</h2>
+
+    <p>
+        <label for="system_size">
+            System Size (kW)
+        </label>
+
+        <input
+            type="number"
+            id="system_size"
+            name="system_size"
+            step="0.01"
+            min="0.01"
+            value="{{ form_data.get(
+                'system_size',
+                quote.system_size
+            ) }}"
+            required
+        >
+    </p>
+
+    <p>
+        <label for="battery_size">
+            Battery Size (kWh)
+        </label>
+
+        <input
+            type="number"
+            id="battery_size"
+            name="battery_size"
+            step="0.01"
+            min="0"
+            value="{{ form_data.get(
+                'battery_size',
+                quote.battery_size if quote.battery_size is not none else ''
+            ) }}"
+        >
+    </p>
+
+    <h2>Status</h2>
+
+    {% set selected_status =
+        form_data.get("status", quote.status)
+    %}
+
+    <p>
+        <select
+            id="status"
+            name="status"
+            required
+        >
+            <option
+                value="draft"
+                {% if selected_status == "draft" %}selected{% endif %}
+            >
+                Draft
+            </option>
+
+            <option
+                value="sent"
+                {% if selected_status == "sent" %}selected{% endif %}
+            >
+                Sent
+            </option>
+
+            <option
+                value="accepted"
+                {% if selected_status == "accepted" %}selected{% endif %}
+            >
+                Accepted
+            </option>
+
+            <option
+                value="rejected"
+                {% if selected_status == "rejected" %}selected{% endif %}
+            >
+                Rejected
+            </option>
+        </select>
+    </p>
+
+    <h2>Products</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Quote Unit Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for product in products %}
+
+                {% set existing_item =
+                    existing_items.get(product.id)
+                %}
+
+                {% if existing_item %}
+                    {% set displayed_price =
+                        existing_item.unit_price
+                    %}
+                {% else %}
+                    {% set displayed_price =
+                        product.unit_price
+                    %}
+                {% endif %}
+
+                <tr>
+                    <td>
+                        {{ product.brand }}
+                        {{ product.model }}
+                    </td>
+
+                    <td>
+                        {{ product.category }}
+                    </td>
+
+                    <td>
+                        {% if product.is_active %}
+                            Active
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        ${{ "%.2f"|format(displayed_price) }}
+                    </td>
+
+                    <td>
+                        {% if form_data %}
+                            {% set quantity_value =
+                                form_data.get(
+                                    'quantity_' ~ product.id,
+                                    '0'
+                                )
+                            %}
+                        {% elif existing_item %}
+                            {% set quantity_value =
+                                existing_item.quantity
+                            %}
+                        {% else %}
+                            {% set quantity_value = 0 %}
+                        {% endif %}
+
+                        <input
+                            type="number"
+                            name="quantity_{{ product.id }}"
+                            min="0"
+                            step="1"
+                            value="{{ quantity_value }}"
+                        >
+                    </td>
+                </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p>
+        Quantity 0 removes a product from the quote.
+    </p>
+
+    <p>
+        <button type="submit">
+            Save Changes
+        </button>
+    </p>
+
+</form>
+
+<p>
+    <a href="{{ url_for(
+        'quotes.quote_detail',
+        quote_id=quote.id
+    ) }}">
+        Cancel
+    </a>
+</p>
+
+{% endblock %}

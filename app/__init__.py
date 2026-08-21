@@ -19,10 +19,12 @@ def create_app():
     from app.blueprints.customers import customers_bp
     from app.blueprints.auth import auth_bp
     from app.blueprints.products import products_bp
+    from app.blueprints.quotes import quotes_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(customers_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(products_bp)
+    app.register_blueprint(quotes_bp)
 
     return app

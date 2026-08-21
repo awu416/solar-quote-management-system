@@ -9,13 +9,34 @@ class Quote(db.Model):
         db.ForeignKey("customer.id"),
         nullable=False
     )
+
     system_size = db.Column(db.Float, nullable=False)
     battery_size = db.Column(db.Float, nullable=True)
-    status = db.Column(db.String(20), nullable=False, default="draft")
-    total_price = db.Column(db.Float, nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
-    
-    customer = db.relationship("Customer", back_populates="quotes")
-    
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="draft"
+    )
+
+    total_price = db.Column(db.Numeric(10, 2), nullable=True)
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=db.func.now()
+    )
+
+    customer = db.relationship(
+        "Customer",
+        back_populates="quotes"
+    )
+
+    items = db.relationship(
+        "QuoteItem",
+        back_populates="quote",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<Quote {self.id}: {self.system_size} kW - {self.status}>"

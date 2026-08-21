@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Quotes{% endblock %}
+
+{% block content %}
+<h1>Quotes</h1>
+
+<p>
+    <a href="{{ url_for('quotes.create_quote') }}">
+        Create Quote
+    </a>
+</p>
+
+{% if quotes %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>System Size</th>
+                <th>Status</th>
+                <th>Total Price</th>
+                <th>Created</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for quote in quotes %}
+            <tr>
+                <td>{{ quote.id }}</td>
+
+                <td>
+                    {{ quote.customer.first_name }}
+                    {{ quote.customer.last_name }}
+                </td>
+
+                <td>{{ quote.system_size }} kW</td>
+
+                <td>{{ quote.status }}</td>
+
+                <td>
+                    {% if quote.total_price is not none %}
+                        ${{ "%.2f"|format(quote.total_price) }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                <td>{{ quote.created_at.strftime("%Y-%m-%d") }}</td>
+
+                <td>
+                    <a href="{{ url_for('quotes.quote_detail', quote_id=quote.id) }}">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No quotes found.</p>
+{% endif %}
+
+{% endblock %}
