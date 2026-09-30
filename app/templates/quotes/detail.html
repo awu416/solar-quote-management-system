@@ -103,6 +103,16 @@
         Edit Quote
     </a>
 </p>
+
+<p>
+    <a
+        href="{{ url_for('quotes.quote_pdf', quote_id=quote.id) }}"
+        target="_blank"
+    >
+        View PDF
+    </a>
+</p>
+
 <p>
     <a href="{{ url_for('quotes.quote_list') }}">
         Back to Quotes

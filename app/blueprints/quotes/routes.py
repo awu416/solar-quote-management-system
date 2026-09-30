@@ -1,12 +1,12 @@
 from decimal import Decimal
 
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, send_file, url_for
 from flask_login import login_required
 
 from app.blueprints.quotes import quotes_bp
 from app.extensions import db
 from app.models import Customer, Product, Quote, QuoteItem
-
+from app.services.pdf_service import generate_quote_pdf
 
 @quotes_bp.route("/")
 @login_required
@@ -383,4 +383,18 @@ def quote_detail(quote_id):
     return render_template(
         "quotes/detail.html",
         quote=quote
+    )
+
+@quotes_bp.route("/<int:quote_id>/pdf")
+@login_required
+def quote_pdf(quote_id):
+    quote = db.get_or_404(Quote, quote_id)
+
+    pdf_buffer = generate_quote_pdf(quote)
+
+    return send_file(
+        pdf_buffer,
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=f"solar_quote_{quote.id}.pdf"
     )
