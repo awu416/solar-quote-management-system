@@ -1,65 +1,136 @@
 {% extends "base.html" %}
 
+{% block title %}
+Edit Customer - Solar Quote Management System
+{% endblock %}
+
 {% block content %}
-<h1>Edit Customer</h1>
 
-{% if error %}
-    <p>{{ error }}</p>
-{% endif %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">CUSTOMER MANAGEMENT</p>
+        <h1>Edit Customer</h1>
 
-<form method="POST">
-    <p>
-        <label for="first_name">First Name</label><br>
-        <input
-            type="text"
-            id="first_name"
-            name="first_name"
-            value="{{ customer.first_name }}"
-            required
-        >
-    </p>
+        <p class="page-subtitle">
+            Update {{ customer.first_name }} {{ customer.last_name }}'s
+            contact information.
+        </p>
+    </div>
+</section>
 
-    <p>
-        <label for="last_name">Last Name</label><br>
-        <input
-            type="text"
-            id="last_name"
-            name="last_name"
-            value="{{ customer.last_name }}"
-            required
-        >
-    </p>
 
-    <p>
-        <label for="email">Email</label><br>
-        <input
-            type="email"
-            id="email"
-            name="email"
-            value="{{ customer.email }}"
-            required
-        >
-    </p>
+<div class="form-layout">
 
-    <p>
-        <label for="phone">Phone</label><br>
-        <input
-            type="text"
-            id="phone"
-            name="phone"
-            value="{{ customer.phone }}"
-            required
-        >
-    </p>
+    <section class="form-card">
 
-    <button type="submit">
-        Save Changes
-    </button>
-</form>
+        <div class="form-card-header">
+            <h2>Customer Information</h2>
 
-<p>
-    <a href="{{ url_for('customers.customer_detail', customer_id=customer.id) }}">
-        Cancel
-    </a>
-</p>
+            <p>
+                Customer #{{ customer.id }}
+            </p>
+        </div>
+
+
+        {% if error %}
+            <div class="form-error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+
+        <form method="POST">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="first_name">
+                        First Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        value="{{ customer.first_name }}"
+                        required
+                        autocomplete="given-name"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="last_name">
+                        Last Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        value="{{ customer.last_name }}"
+                        required
+                        autocomplete="family-name"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ customer.email }}"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="phone">
+                        Phone Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="phone"
+                        name="phone"
+                        value="{{ customer.phone }}"
+                        required
+                        autocomplete="tel"
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('customers.customer_detail', customer_id=customer.id) }}"
+                    class="btn btn-outline"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
 {% endblock %}

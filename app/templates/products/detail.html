@@ -1,74 +1,249 @@
 {% extends "base.html" %}
 
-{% block title %}Product Details{% endblock %}
+{% block title %}
+{{ product.brand }} {{ product.model }} - Solar Quote Management System
+{% endblock %}
 
 {% block content %}
-<h1>Product Details</h1>
 
-<p>
-    <strong>Name:</strong>
-    {{ product.name }}
-</p>
+<section class="page-header">
 
-<p>
-    <strong>Category:</strong>
-    {{ product.category }}
-</p>
+    <div>
+        <p class="eyebrow">PRODUCT DETAILS</p>
 
-<p>
-    <strong>Brand:</strong>
-    {{ product.brand }}
-</p>
+        <h1>{{ product.name }}</h1>
 
-<p>
-    <strong>Model:</strong>
-    {{ product.model }}
-</p>
+        <p class="page-subtitle">
+            {{ product.brand }} · {{ product.model }}
+        </p>
+    </div>
 
-<p>
-    <strong>Unit Price:</strong>
-    ${{ "%.2f"|format(product.unit_price) }}
-</p>
 
-<p>
-    <strong>Status:</strong>
+    <div class="page-actions">
+
+        <a
+            href="{{ url_for('products.list_products') }}"
+            class="btn btn-outline"
+        >
+            ← Products
+        </a>
+
+        <a
+            href="{{ url_for('products.edit_product', product_id=product.id) }}"
+            class="btn btn-primary"
+        >
+            Edit Product
+        </a>
+
+    </div>
+
+</section>
+
+
+<div class="product-detail-layout">
+
+    <section class="content-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Product Information</h2>
+                <p>Catalogue specifications and pricing.</p>
+            </div>
+
+            {% if product.is_active %}
+                <span class="status-badge status-accepted">
+                    Active
+                </span>
+            {% else %}
+                <span class="status-badge status-draft">
+                    Inactive
+                </span>
+            {% endif %}
+
+        </div>
+
+
+        <div class="detail-content">
+
+            <div class="product-profile">
+
+                <div class="product-icon product-icon-large">
+
+                    {% if product.category == "panel" %}
+                        ☀
+                    {% elif product.category == "inverter" %}
+                        ⚡
+                    {% elif product.category == "battery" %}
+                        ▣
+                    {% else %}
+                        •
+                    {% endif %}
+
+                </div>
+
+
+                <div>
+
+                    <span class="category-badge">
+
+                        {% if product.category == "panel" %}
+                            Solar Panel
+                        {% elif product.category == "inverter" %}
+                            Inverter
+                        {% elif product.category == "battery" %}
+                            Battery
+                        {% else %}
+                            {{ product.category|capitalize }}
+                        {% endif %}
+
+                    </span>
+
+                    <h3>{{ product.name }}</h3>
+
+                    <p>
+                        {{ product.brand }} · {{ product.model }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <dl class="detail-list">
+
+                <div class="detail-row">
+                    <dt>Product ID</dt>
+                    <dd>#{{ product.id }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Category</dt>
+
+                    <dd>
+                        {% if product.category == "panel" %}
+                            Solar Panel
+                        {% elif product.category == "inverter" %}
+                            Inverter
+                        {% elif product.category == "battery" %}
+                            Battery
+                        {% else %}
+                            {{ product.category|capitalize }}
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Brand</dt>
+                    <dd>{{ product.brand }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Model</dt>
+                    <dd>{{ product.model }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Status</dt>
+
+                    <dd>
+                        {% if product.is_active %}
+                            Active
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+    </section>
+
+
+    <section class="price-card">
+
+        <p class="price-label">
+            CURRENT CATALOGUE PRICE
+        </p>
+
+        <div class="product-price">
+            ${{ "%.2f"|format(product.unit_price) }}
+        </div>
+
+        <p class="price-note">
+            This price is used when the product is added
+            to a new quotation.
+        </p>
+
+        <div class="snapshot-note">
+            Historical quotations retain the price recorded
+            when the product was originally added.
+        </div>
+
+    </section>
+
+</div>
+
+
+<section class="product-status-zone">
+
+    <div>
+
+        {% if product.is_active %}
+
+            <h3>Deactivate Product</h3>
+
+            <p>
+                Deactivated products remain in the catalogue history
+                but should not be used for new quotations.
+            </p>
+
+        {% else %}
+
+            <h3>Reactivate Product</h3>
+
+            <p>
+                Reactivate this product so it can be used again
+                in new quotations.
+            </p>
+
+        {% endif %}
+
+    </div>
+
 
     {% if product.is_active %}
-        Active
+
+        <form
+            method="POST"
+            action="{{ url_for('products.deactivate_product', product_id=product.id) }}"
+        >
+            <button
+                type="submit"
+                class="btn btn-danger"
+            >
+                Deactivate Product
+            </button>
+        </form>
+
     {% else %}
-        Inactive
+
+        <form
+            method="POST"
+            action="{{ url_for('products.activate_product', product_id=product.id) }}"
+        >
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Reactivate Product
+            </button>
+        </form>
+
     {% endif %}
-</p>
 
-<p>
-    <a href="{{ url_for('products.edit_product', product_id=product.id) }}">
-        Edit Product
-    </a>
-</p>
+</section>
 
-{% if product.is_active %}
-    <form
-        method="POST"
-        action="{{ url_for('products.deactivate_product', product_id=product.id) }}"
-    >
-        <button type="submit">
-            Deactivate Product
-        </button>
-    </form>
-{% else %}
-    <form
-        method="POST"
-        action="{{ url_for('products.activate_product', product_id=product.id) }}"
-    >
-        <button type="submit">
-            Reactivate Product
-        </button>
-    </form>
-{% endif %}
-
-<p>
-    <a href="{{ url_for('products.list_products') }}">
-        Back to Products
-    </a>
-</p>
 {% endblock %}

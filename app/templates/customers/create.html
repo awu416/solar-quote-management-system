@@ -1,61 +1,127 @@
 {% extends "base.html" %}
 
+{% block title %}
+Create Customer - Solar Quote Management System
+{% endblock %}
+
 {% block content %}
-<h1>Create Customer</h1>
 
-{% if error %}
-    <p>{{ error }}</p>
-{% endif %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">CUSTOMER MANAGEMENT</p>
+        <h1>Add Customer</h1>
+        <p class="page-subtitle">
+            Create a new customer record for future quotations.
+        </p>
+    </div>
+</section>
 
-<form method="POST">
-    <p>
-        <label for="first_name">First Name</label><br>
-        <input
-            type="text"
-            id="first_name"
-            name="first_name"
-            required
-        >
-    </p>
 
-    <p>
-        <label for="last_name">Last Name</label><br>
-        <input
-            type="text"
-            id="last_name"
-            name="last_name"
-            required
-        >
-    </p>
+<div class="form-layout">
 
-    <p>
-        <label for="email">Email</label><br>
-        <input
-            type="email"
-            id="email"
-            name="email"
-            required
-        >
-    </p>
+    <section class="form-card">
 
-    <p>
-        <label for="phone">Phone</label><br>
-        <input
-            type="text"
-            id="phone"
-            name="phone"
-            required
-        >
-    </p>
+        <div class="form-card-header">
+            <h2>Customer Information</h2>
+            <p>Enter the customer's contact details below.</p>
+        </div>
 
-    <button type="submit">
-        Create Customer
-    </button>
-</form>
 
-<p>
-    <a href="{{ url_for('customers.customer_list') }}">
-        Back to Customers
-    </a>
-</p>
+        {% if error %}
+            <div class="form-error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+
+        <form method="POST">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="first_name">
+                        First Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        required
+                        autocomplete="given-name"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="last_name">
+                        Last Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        required
+                        autocomplete="family-name"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="phone">
+                        Phone Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="phone"
+                        name="phone"
+                        required
+                        autocomplete="tel"
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('customers.customer_list') }}"
+                    class="btn btn-outline"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Create Customer
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
 {% endblock %}

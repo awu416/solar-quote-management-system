@@ -1,65 +1,188 @@
 {% extends "base.html" %}
 
-{% block title %}Quotes{% endblock %}
+{% block title %}
+Quotes - Solar Quote Management System
+{% endblock %}
 
 {% block content %}
-<h1>Quotes</h1>
 
-<p>
-    <a href="{{ url_for('quotes.create_quote') }}">
-        Create Quote
+<section class="page-header">
+
+    <div>
+        <p class="eyebrow">QUOTE MANAGEMENT</p>
+
+        <h1>Quotes</h1>
+
+        <p class="page-subtitle">
+            Manage solar quotations, pricing and customer proposals.
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('quotes.create_quote') }}"
+        class="btn btn-primary"
+    >
+        + Create Quote
     </a>
-</p>
 
-{% if quotes %}
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>System Size</th>
-                <th>Status</th>
-                <th>Total Price</th>
-                <th>Created</th>
-                <th>Action</th>
-            </tr>
-        </thead>
+</section>
 
-        <tbody>
-            {% for quote in quotes %}
-            <tr>
-                <td>{{ quote.id }}</td>
 
-                <td>
-                    {{ quote.customer.first_name }}
-                    {{ quote.customer.last_name }}
-                </td>
+<section class="content-card">
 
-                <td>{{ quote.system_size }} kW</td>
+    <div class="card-header">
 
-                <td>{{ quote.status }}</td>
+        <div>
+            <h2>Quotation Register</h2>
 
-                <td>
-                    {% if quote.total_price is not none %}
-                        ${{ "%.2f"|format(quote.total_price) }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
+            <p>
+                {{ quotes|length }}
+                {% if quotes|length == 1 %}
+                    quotation
+                {% else %}
+                    quotations
+                {% endif %}
+                in the system.
+            </p>
+        </div>
 
-                <td>{{ quote.created_at.strftime("%Y-%m-%d") }}</td>
+    </div>
 
-                <td>
-                    <a href="{{ url_for('quotes.quote_detail', quote_id=quote.id) }}">
-                        View
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No quotes found.</p>
-{% endif %}
+
+    {% if quotes %}
+
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Quote</th>
+                        <th>Customer</th>
+                        <th>System</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for quote in quotes %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    Quote #{{ quote.id }}
+                                </strong>
+                            </td>
+
+
+                            <td>
+
+                                <div class="quote-customer-cell">
+
+                                    <div class="avatar">
+                                        {{ quote.customer.first_name[0] }}
+                                        {{ quote.customer.last_name[0] }}
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ quote.customer.first_name }}
+                                            {{ quote.customer.last_name }}
+                                        </strong>
+
+                                        <div class="table-secondary">
+                                            {{ quote.customer.email }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                <strong>{{ quote.system_size }} kW</strong>
+
+                                {% if quote.battery_size is not none %}
+                                    <div class="table-secondary">
+                                        {{ quote.battery_size }} kWh battery
+                                    </div>
+                                {% endif %}
+                            </td>
+
+
+                            <td>
+                                <span class="status-badge status-{{ quote.status }}">
+                                    {{ quote.status|capitalize }}
+                                </span>
+                            </td>
+
+
+                            <td class="price-cell">
+
+                                {% if quote.total_price is not none %}
+                                    ${{ "%.2f"|format(quote.total_price) }}
+                                {% else %}
+                                    $0.00
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ quote.created_at.strftime("%d %b %Y") }}
+                            </td>
+
+
+                            <td class="table-action">
+
+                                <a
+                                    href="{{ url_for('quotes.quote_detail', quote_id=quote.id) }}"
+                                    class="text-link"
+                                >
+                                    View →
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No quotations yet</h3>
+
+            <p>
+                Create your first solar quotation to get started.
+            </p>
+
+            <a
+                href="{{ url_for('quotes.create_quote') }}"
+                class="btn btn-primary"
+            >
+                Create Quote
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
 
 {% endblock %}

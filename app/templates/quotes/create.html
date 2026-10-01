@@ -1,152 +1,301 @@
 {% extends "base.html" %}
 
-{% block title %}Create Quote{% endblock %}
+{% block title %}
+Create Quote - Solar Quote Management System
+{% endblock %}
 
 {% block content %}
 
-<h1>Create Quote</h1>
+<section class="page-header">
+
+    <div>
+        <p class="eyebrow">NEW QUOTATION</p>
+
+        <h1>Create Quote</h1>
+
+        <p class="page-subtitle">
+            Configure the solar system and select products for this quotation.
+        </p>
+    </div>
+
+</section>
+
 
 {% if errors %}
-    <div>
-        <h3>Please fix the following:</h3>
 
-        <ul>
+    <div class="form-error quote-form-error">
+
+        <strong>Please correct the following:</strong>
+
+        <ul class="error-list">
             {% for error in errors %}
                 <li>{{ error }}</li>
             {% endfor %}
         </ul>
+
     </div>
+
 {% endif %}
 
-<form method="POST">
 
-    <h2>Customer</h2>
+<form method="POST" class="quote-form">
 
-    <p>
-        <label for="customer_id">
-            Customer
-        </label>
+    <!-- Customer and System -->
+    <section class="content-card quote-section">
 
-        <select
-            id="customer_id"
-            name="customer_id"
-            required
-        >
-            <option value="">
-                Select a customer
-            </option>
+        <div class="card-header">
+            <div>
+                <h2>Quote Information</h2>
+                <p>Select the customer and configure the system.</p>
+            </div>
+        </div>
 
-            {% for customer in customers %}
-                <option
-                    value="{{ customer.id }}"
-                    {% if form_data.get("customer_id") == customer.id|string %}
-                        selected
-                    {% endif %}
-                >
-                    {{ customer.first_name }}
-                    {{ customer.last_name }}
-                    — {{ customer.email }}
-                </option>
-            {% endfor %}
-        </select>
-    </p>
 
-    <h2>System Information</h2>
+        <div class="quote-form-content">
 
-    <p>
-        <label for="system_size">
-            System Size (kW)
-        </label>
+            <div class="form-grid">
 
-        <input
-            type="number"
-            id="system_size"
-            name="system_size"
-            step="0.01"
-            min="0.01"
-            value="{{ form_data.get('system_size', '') }}"
-            required
-        >
-    </p>
+                <div class="form-group form-group-full">
 
-    <p>
-        <label for="battery_size">
-            Battery Size (kWh)
-        </label>
+                    <label for="customer_id">
+                        Customer
+                    </label>
 
-        <input
-            type="number"
-            id="battery_size"
-            name="battery_size"
-            step="0.01"
-            min="0"
-            value="{{ form_data.get('battery_size', '') }}"
-        >
-    </p>
+                    <select
+                        id="customer_id"
+                        name="customer_id"
+                        required
+                    >
 
-    <h2>Products</h2>
+                        <option value="">
+                            Select a customer
+                        </option>
 
-    {% if products %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Current Unit Price</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
+                        {% for customer in customers %}
 
-            <tbody>
-                {% for product in products %}
-                    <tr>
-                        <td>
-                            {{ product.brand }}
-                            {{ product.model }}
-                        </td>
-
-                        <td>
-                            {{ product.category }}
-                        </td>
-
-                        <td>
-                            ${{ "%.2f"|format(product.unit_price) }}
-                        </td>
-
-                        <td>
-                            <input
-                                type="number"
-                                name="quantity_{{ product.id }}"
-                                min="0"
-                                step="1"
-                                value="{{ form_data.get(
-                                    'quantity_' ~ product.id,
-                                    ''
-                                ) }}"
+                            <option
+                                value="{{ customer.id }}"
+                                {% if form_data.get("customer_id") == customer.id|string %}
+                                    selected
+                                {% endif %}
                             >
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>
-            No active products are currently available.
-        </p>
-    {% endif %}
+                                {{ customer.first_name }}
+                                {{ customer.last_name }}
+                                — {{ customer.email }}
+                            </option>
 
-    <p>
-        <button type="submit">
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="system_size">
+                        System Size (kW)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="system_size"
+                        name="system_size"
+                        step="0.01"
+                        min="0.01"
+                        value="{{ form_data.get('system_size', '') }}"
+                        placeholder="e.g. 6.6"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="battery_size">
+                        Battery Size (kWh)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="battery_size"
+                        name="battery_size"
+                        step="0.01"
+                        min="0"
+                        value="{{ form_data.get('battery_size', '') }}"
+                        placeholder="Optional"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Products -->
+    <section class="content-card quote-section">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Products</h2>
+
+                <p>
+                    Enter a quantity for each product included in the quote.
+                </p>
+            </div>
+
+        </div>
+
+
+        {% if products %}
+
+            <div class="table-wrapper">
+
+                <table class="data-table quote-product-table">
+
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Current Unit Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for product in products %}
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="product-name-cell">
+
+                                        <div class="product-icon">
+
+                                            {% if product.category == "panel" %}
+                                                ☀
+                                            {% elif product.category == "inverter" %}
+                                                ⚡
+                                            {% elif product.category == "battery" %}
+                                                ▣
+                                            {% else %}
+                                                •
+                                            {% endif %}
+
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                {{ product.brand }}
+                                                {{ product.model }}
+                                            </strong>
+
+                                            <div class="table-secondary">
+                                                {{ product.name }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="category-badge">
+
+                                        {% if product.category == "panel" %}
+                                            Solar Panel
+                                        {% elif product.category == "inverter" %}
+                                            Inverter
+                                        {% elif product.category == "battery" %}
+                                            Battery
+                                        {% else %}
+                                            {{ product.category|capitalize }}
+                                        {% endif %}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td class="price-cell">
+                                    ${{ "%.2f"|format(product.unit_price) }}
+                                </td>
+
+
+                                <td>
+
+                                    <input
+                                        class="quantity-input"
+                                        type="number"
+                                        name="quantity_{{ product.id }}"
+                                        min="0"
+                                        step="1"
+                                        value="{{ form_data.get(
+                                            'quantity_' ~ product.id,
+                                            ''
+                                        ) }}"
+                                        placeholder="0"
+                                    >
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h3>No active products</h3>
+
+                <p>
+                    No active products are currently available
+                    for new quotations.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <div class="quote-form-actions">
+
+        <a
+            href="{{ url_for('quotes.quote_list') }}"
+            class="btn btn-outline"
+        >
+            Cancel
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
             Create Quote
         </button>
-    </p>
+
+    </div>
 
 </form>
-
-<p>
-    <a href="{{ url_for('quotes.quote_list') }}">
-        Back to Quotes
-    </a>
-</p>
 
 {% endblock %}

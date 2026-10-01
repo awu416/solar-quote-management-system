@@ -1,58 +1,181 @@
 {% extends "base.html" %}
 
-{% block title %}Products{% endblock %}
+{% block title %}
+Products - Solar Quote Management System
+{% endblock %}
 
 {% block content %}
-<h1>Products</h1>
 
-<p>
-    <a href="{{ url_for('products.create_product') }}">
-        Create Product
+<section class="page-header">
+    <div>
+        <p class="eyebrow">PRODUCT CATALOGUE</p>
+        <h1>Products</h1>
+        <p class="page-subtitle">
+            Manage solar panels, inverters and battery products.
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('products.create_product') }}"
+        class="btn btn-primary"
+    >
+        + Add Product
     </a>
-</p>
+</section>
 
-{% if products %}
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Unit Price</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
 
-        <tbody>
-            {% for product in products %}
-            <tr>
-                <td>{{ product.name }}</td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.brand }}</td>
-                <td>{{ product.model }}</td>
-                <td>${{ "%.2f"|format(product.unit_price) }}</td>
+<section class="content-card">
 
-                <td>
-                    {% if product.is_active %}
-                        Active
-                    {% else %}
-                        Inactive
-                    {% endif %}
-                </td>
+    <div class="card-header">
+        <div>
+            <h2>Product Catalogue</h2>
+            <p>
+                {{ products|length }}
+                {% if products|length == 1 %}
+                    product
+                {% else %}
+                    products
+                {% endif %}
+                in the system.
+            </p>
+        </div>
+    </div>
 
-                <td>
-                    <a href="{{ url_for('products.product_detail', product_id=product.id) }}">
-                        View
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
-{% else %}
-    <p>No products found.</p>
-{% endif %}
+    {% if products %}
+
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Unit Price</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for product in products %}
+
+                        <tr>
+
+                            <td>
+                                <div class="product-name-cell">
+
+                                    <div class="product-icon">
+                                        {% if product.category == "panel" %}
+                                            ☀
+                                        {% elif product.category == "inverter" %}
+                                            ⚡
+                                        {% elif product.category == "battery" %}
+                                            ▣
+                                        {% else %}
+                                            •
+                                        {% endif %}
+                                    </div>
+
+                                    <div>
+                                        <strong>{{ product.name }}</strong>
+
+                                        <div class="table-secondary">
+                                            Product #{{ product.id }}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </td>
+
+
+                            <td>
+                                <span class="category-badge">
+                                    {% if product.category == "panel" %}
+                                        Solar Panel
+                                    {% elif product.category == "inverter" %}
+                                        Inverter
+                                    {% elif product.category == "battery" %}
+                                        Battery
+                                    {% else %}
+                                        {{ product.category|capitalize }}
+                                    {% endif %}
+                                </span>
+                            </td>
+
+
+                            <td>
+                                {{ product.brand }}
+                            </td>
+
+
+                            <td>
+                                {{ product.model }}
+                            </td>
+
+
+                            <td class="price-cell">
+                                ${{ "%.2f"|format(product.unit_price) }}
+                            </td>
+
+
+                            <td>
+                                {% if product.is_active %}
+                                    <span class="status-badge status-accepted">
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge status-draft">
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+
+                            <td class="table-action">
+                                <a
+                                    href="{{ url_for('products.product_detail', product_id=product.id) }}"
+                                    class="text-link"
+                                >
+                                    View →
+                                </a>
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No products yet</h3>
+
+            <p>
+                Add your first solar product to begin building quotations.
+            </p>
+
+            <a
+                href="{{ url_for('products.create_product') }}"
+                class="btn btn-primary"
+            >
+                Add Product
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
 {% endblock %}

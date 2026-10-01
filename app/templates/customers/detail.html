@@ -1,68 +1,231 @@
 {% extends "base.html" %}
 
+{% block title %}
+{{ customer.first_name }} {{ customer.last_name }} - Solar Quote Management System
+{% endblock %}
+
 {% block content %}
-<h1>{{ customer.first_name }} {{ customer.last_name }}</h1>
+
+<section class="page-header">
+
+    <div>
+        <p class="eyebrow">CUSTOMER PROFILE</p>
+
+        <h1>
+            {{ customer.first_name }}
+            {{ customer.last_name }}
+        </h1>
+
+        <p class="page-subtitle">
+            Customer #{{ customer.id }}
+        </p>
+    </div>
+
+
+    <div class="page-actions">
+
+        <a
+            href="{{ url_for('customers.customer_list') }}"
+            class="btn btn-outline"
+        >
+            ← Customers
+        </a>
+
+        <a
+            href="{{ url_for('customers.customer_edit', customer_id=customer.id) }}"
+            class="btn btn-primary"
+        >
+            Edit Customer
+        </a>
+
+    </div>
+
+</section>
+
+
 {% if delete_error == "quotes" %}
-    <p>
-        This customer cannot be deleted because they have existing quotes.
-    </p>
+
+    <div class="alert alert-danger">
+        <strong>Customer cannot be deleted.</strong>
+        This customer has existing quotations that must be retained.
+    </div>
+
 {% endif %}
 
-<h2>Customer Information</h2>
 
-<p>
-    <strong>Customer ID:</strong>
-    {{ customer.id }}
-</p>
+<div class="detail-grid">
 
-<p>
-    <strong>Email:</strong>
-    {{ customer.email }}
-</p>
+    <!-- Customer Information -->
+    <section class="content-card">
 
-<p>
-    <strong>Phone:</strong>
-    {{ customer.phone }}
-</p>
+        <div class="card-header">
+            <div>
+                <h2>Customer Information</h2>
+                <p>Contact and account details.</p>
+            </div>
+        </div>
 
-<h2>Quotes</h2>
 
-{% if customer.quotes %}
-    <ul>
-        {% for quote in customer.quotes %}
-            <li>
-                Quote #{{ quote.id }}
-                — {{ quote.system_size }} kW
-                — Status: {{ quote.status }}
-                — Total Price:
-                {% if quote.total_price is not none %}
-                    ${{ quote.total_price }}
-                {% else %}
-                    Not set
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>This customer has no quotes.</p>
-{% endif %}
+        <div class="detail-content">
 
-<p>
-    <a href="{{ url_for('customers.customer_edit', customer_id=customer.id) }}">
-        Edit Customer
-    </a>
-</p>
-<form
-    method="POST"
-    action="{{ url_for('customers.customer_delete', customer_id=customer.id) }}"
->
-    <button type="submit">
-        Delete Customer
-    </button>
-</form>
-<p>
-    <a href="{{ url_for('customers.customer_list') }}">
-        Back to Customers
-    </a>
-</p>
+            <div class="profile-summary">
+
+                <div class="avatar avatar-large">
+                    {{ customer.first_name[0] }}
+                    {{ customer.last_name[0] }}
+                </div>
+
+                <div>
+                    <h3>
+                        {{ customer.first_name }}
+                        {{ customer.last_name }}
+                    </h3>
+
+                    <p>
+                        Customer #{{ customer.id }}
+                    </p>
+                </div>
+
+            </div>
+
+
+            <dl class="detail-list">
+
+                <div class="detail-row">
+                    <dt>Email</dt>
+                    <dd>{{ customer.email }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Phone</dt>
+                    <dd>{{ customer.phone }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Total Quotes</dt>
+                    <dd>{{ customer.quotes|length }}</dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+    </section>
+
+
+    <!-- Customer Quotes -->
+    <section class="content-card">
+
+        <div class="card-header">
+            <div>
+                <h2>Quotation History</h2>
+                <p>Quotes associated with this customer.</p>
+            </div>
+        </div>
+
+
+        {% if customer.quotes %}
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+                        <tr>
+                            <th>Quote</th>
+                            <th>System</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for quote in customer.quotes %}
+
+                            <tr>
+
+                                <td>
+                                    <a
+                                        href="{{ url_for('quotes.quote_detail', quote_id=quote.id) }}"
+                                        class="text-link"
+                                    >
+                                        #{{ quote.id }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ quote.system_size }} kW
+                                </td>
+
+                                <td>
+                                    <span class="status-badge status-{{ quote.status }}">
+                                        {{ quote.status|capitalize }}
+                                    </span>
+                                </td>
+
+                                <td class="price-cell">
+
+                                    {% if quote.total_price is not none %}
+                                        ${{ "%.2f"|format(quote.total_price) }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <h3>No quotations</h3>
+
+                <p>
+                    This customer does not have any quotations yet.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+
+<section class="danger-zone">
+
+    <div>
+        <h3>Delete Customer</h3>
+
+        <p>
+            Permanently remove this customer from the system.
+            Customers with existing quotations cannot be deleted.
+        </p>
+    </div>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('customers.customer_delete', customer_id=customer.id) }}"
+        onsubmit="return confirm('Are you sure you want to delete this customer?');"
+    >
+        <button
+            type="submit"
+            class="btn btn-danger"
+        >
+            Delete Customer
+        </button>
+    </form>
+
+</section>
+
 {% endblock %}

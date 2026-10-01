@@ -1,43 +1,100 @@
 {% extends "base.html" %}
 
 {% block title %}
-Login | Solar Quote Management System
+Login - Solar Quote Management System
 {% endblock %}
 
 {% block content %}
 
-<h1>Login</h1>
+<div class="login-page">
 
-{% if error %}
-    <p>{{ error }}</p>
-{% endif %}
+    <section class="login-card">
 
-<form method="POST">
+        <div class="login-brand">
 
-    <div>
-        <label for="email">Email</label>
-        <input
-            type="email"
-            id="email"
-            name="email"
-            required
-        >
-    </div>
+            <p class="eyebrow">
+                TASMANIA RELIABLE SOLAR
+            </p>
 
-    <div>
-        <label for="password">Password</label>
-        <input
-            type="password"
-            id="password"
-            name="password"
-            required
-        >
-    </div>
+            <h1>Welcome Back</h1>
 
-    <button type="submit">
-        Login
-    </button>
+            <p>
+                Sign in to manage customers, products
+                and solar quotations.
+            </p>
 
-</form>
+        </div>
+
+
+        {% if error %}
+
+            <div class="form-error login-error">
+                {{ error }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="POST" class="login-form">
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ request.form.get('email', '') }}"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="btn btn-primary login-button"
+            >
+                Sign In
+            </button>
+
+        </form>
+
+
+        <div class="login-footer">
+
+            <span class="login-security-dot"></span>
+
+            Secure internal quotation management system
+
+        </div>
+
+    </section>
+
+</div>
 
 {% endblock %}

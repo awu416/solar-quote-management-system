@@ -1,29 +1,141 @@
 {% extends "base.html" %}
 
+{% block title %}
+Customers - Solar Quote Management System
+{% endblock %}
+
 {% block content %}
-<h1>Customers</h1>
 
-<p>
-    <a href="{{ url_for('customers.customer_create') }}">
-        Create Customer
+<section class="page-header">
+    <div>
+        <p class="eyebrow">CUSTOMER MANAGEMENT</p>
+        <h1>Customers</h1>
+        <p class="page-subtitle">
+            Manage customer contact information and quotation history.
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('customers.customer_create') }}"
+        class="btn btn-primary"
+    >
+        + Add Customer
     </a>
-</p>
+</section>
 
-{% if customers %}
-    <ul>
-        {% for customer in customers %}
-            <li>
-                <a href="{{ url_for('customers.customer_detail', customer_id=customer.id) }}">
-                    {{ customer.first_name }}
-                    {{ customer.last_name }}
-                </a>
 
-                — {{ customer.email }}
-                — {{ customer.phone }}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No customers found.</p>
-{% endif %}
+<section class="content-card">
+
+    <div class="card-header">
+        <div>
+            <h2>Customer Directory</h2>
+            <p>
+                {{ customers|length }}
+                {% if customers|length == 1 %}
+                    customer
+                {% else %}
+                    customers
+                {% endif %}
+                in the system.
+            </p>
+        </div>
+    </div>
+
+
+    {% if customers %}
+
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Quotes</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for customer in customers %}
+
+                        <tr>
+
+                            <td>
+                                <div class="customer-name-cell">
+                                    <div class="avatar">
+                                        {{ customer.first_name[0] }}
+                                        {{ customer.last_name[0] }}
+                                    </div>
+
+                                    <div>
+                                        <strong>
+                                            {{ customer.first_name }}
+                                            {{ customer.last_name }}
+                                        </strong>
+
+                                        <div class="table-secondary">
+                                            Customer #{{ customer.id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ customer.email }}
+                            </td>
+
+                            <td>
+                                {{ customer.phone }}
+                            </td>
+
+                            <td>
+                                <span class="count-badge">
+                                    {{ customer.quotes|length }}
+                                </span>
+                            </td>
+
+                            <td class="table-action">
+                                <a
+                                    href="{{ url_for('customers.customer_detail', customer_id=customer.id) }}"
+                                    class="text-link"
+                                >
+                                    View →
+                                </a>
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <h3>No customers yet</h3>
+
+            <p>
+                Add your first customer to start creating solar quotations.
+            </p>
+
+            <a
+                href="{{ url_for('customers.customer_create') }}"
+                class="btn btn-primary"
+            >
+                Add Customer
+            </a>
+        </div>
+
+    {% endif %}
+
+</section>
+
 {% endblock %}

@@ -1,122 +1,356 @@
 {% extends "base.html" %}
 
-{% block title %}Quote {{ quote.id }}{% endblock %}
+{% block title %}
+Quote #{{ quote.id }} - Solar Quote Management System
+{% endblock %}
 
 {% block content %}
 
-<h1>Quote #{{ quote.id }}</h1>
+<section class="page-header quote-detail-header">
 
-<h2>Customer</h2>
+    <div>
 
-<p>
-    <strong>Name:</strong>
-    {{ quote.customer.first_name }}
-    {{ quote.customer.last_name }}
-</p>
+        <div class="quote-title-row">
 
-<p>
-    <strong>Email:</strong>
-    {{ quote.customer.email }}
-</p>
+            <p class="eyebrow">SOLAR QUOTATION</p>
 
-<p>
-    <strong>Phone:</strong>
-    {{ quote.customer.phone }}
-</p>
+            <span class="status-badge status-{{ quote.status }}">
+                {{ quote.status|capitalize }}
+            </span>
 
-<h2>Quote Information</h2>
+        </div>
 
-<p>
-    <strong>System Size:</strong>
-    {{ quote.system_size }} kW
-</p>
+        <h1>Quote #{{ quote.id }}</h1>
 
-<p>
-    <strong>Battery Size:</strong>
-    {% if quote.battery_size is not none %}
-        {{ quote.battery_size }} kWh
+        <p class="page-subtitle">
+            Created {{ quote.created_at.strftime("%d %B %Y at %H:%M") }}
+        </p>
+
+    </div>
+
+
+    <div class="page-actions">
+
+        <a
+            href="{{ url_for('quotes.quote_list') }}"
+            class="btn btn-outline"
+        >
+            ← Quotes
+        </a>
+
+        <a
+            href="{{ url_for('quotes.edit_quote', quote_id=quote.id) }}"
+            class="btn btn-outline"
+        >
+            Edit Quote
+        </a>
+
+        <a
+            href="{{ url_for('quotes.quote_pdf', quote_id=quote.id) }}"
+            target="_blank"
+            class="btn btn-primary"
+        >
+            View PDF
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- Quote Overview -->
+<div class="quote-overview-grid">
+
+    <!-- Customer -->
+    <section class="content-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Customer</h2>
+                <p>Quotation recipient.</p>
+            </div>
+
+        </div>
+
+
+        <div class="detail-content">
+
+            <div class="profile-summary">
+
+                <div class="avatar avatar-large">
+                    {{ quote.customer.first_name[0] }}
+                    {{ quote.customer.last_name[0] }}
+                </div>
+
+                <div>
+
+                    <h3>
+                        {{ quote.customer.first_name }}
+                        {{ quote.customer.last_name }}
+                    </h3>
+
+                    <p>
+                        Customer #{{ quote.customer.id }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <dl class="detail-list">
+
+                <div class="detail-row">
+                    <dt>Email</dt>
+                    <dd>{{ quote.customer.email }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Phone</dt>
+                    <dd>{{ quote.customer.phone }}</dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+    </section>
+
+
+    <!-- System -->
+    <section class="content-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>System Configuration</h2>
+                <p>Solar and battery capacity.</p>
+            </div>
+
+        </div>
+
+
+        <div class="system-metrics">
+
+            <div class="system-metric">
+
+                <span class="metric-label">
+                    SOLAR SYSTEM
+                </span>
+
+                <strong>
+                    {{ quote.system_size }}
+                    <small>kW</small>
+                </strong>
+
+            </div>
+
+
+            <div class="system-metric">
+
+                <span class="metric-label">
+                    BATTERY
+                </span>
+
+                <strong>
+
+                    {% if quote.battery_size is not none %}
+                        {{ quote.battery_size }}
+                        <small>kWh</small>
+                    {% else %}
+                        <span class="metric-none">None</span>
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Total -->
+    <section class="quote-total-card">
+
+        <span class="quote-total-label">
+            QUOTE TOTAL
+        </span>
+
+        <div class="quote-total-value">
+
+            {% if quote.total_price is not none %}
+                ${{ "%.2f"|format(quote.total_price) }}
+            {% else %}
+                $0.00
+            {% endif %}
+
+        </div>
+
+        <span class="quote-total-caption">
+            Total quoted system price
+        </span>
+
+    </section>
+
+</div>
+
+
+<!-- Quote Items -->
+<section class="content-card quote-items-card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Quote Items</h2>
+
+            <p>
+                Products and prices recorded for this quotation.
+            </p>
+        </div>
+
+    </div>
+
+
+    {% if quote.items %}
+
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Line Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in quote.items %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="product-name-cell">
+
+                                    <div class="product-icon">
+
+                                        {% if item.product.category == "panel" %}
+                                            ☀
+                                        {% elif item.product.category == "inverter" %}
+                                            ⚡
+                                        {% elif item.product.category == "battery" %}
+                                            ▣
+                                        {% else %}
+                                            •
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ item.product.brand }}
+                                            {{ item.product.model }}
+                                        </strong>
+
+                                        <div class="table-secondary">
+                                            {{ item.product.name }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="category-badge">
+
+                                    {% if item.product.category == "panel" %}
+                                        Solar Panel
+                                    {% elif item.product.category == "inverter" %}
+                                        Inverter
+                                    {% elif item.product.category == "battery" %}
+                                        Battery
+                                    {% else %}
+                                        {{ item.product.category|capitalize }}
+                                    {% endif %}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ item.quantity }}
+                            </td>
+
+
+                            <td class="price-cell">
+                                ${{ "%.2f"|format(item.unit_price) }}
+                            </td>
+
+
+                            <td class="price-cell">
+                                ${{ "%.2f"|format(item.line_total) }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="quote-items-total">
+
+            <span>Total</span>
+
+            <strong>
+
+                {% if quote.total_price is not none %}
+                    ${{ "%.2f"|format(quote.total_price) }}
+                {% else %}
+                    $0.00
+                {% endif %}
+
+            </strong>
+
+        </div>
+
     {% else %}
-        None
+
+        <div class="empty-state">
+
+            <h3>No quote items</h3>
+
+            <p>
+                No products have been added to this quotation.
+            </p>
+
+        </div>
+
     {% endif %}
-</p>
 
-<p>
-    <strong>Status:</strong>
-    {{ quote.status }}
-</p>
+</section>
 
-<p>
-    <strong>Created:</strong>
-    {{ quote.created_at.strftime("%Y-%m-%d %H:%M") }}
-</p>
 
-<h2>Products</h2>
-
-{% if quote.items %}
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Line Total</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for item in quote.items %}
-            <tr>
-                <td>
-                    {{ item.product.brand }}
-                    {{ item.product.model }}
-                </td>
-
-                <td>{{ item.product.category }}</td>
-
-                <td>{{ item.quantity }}</td>
-
-                <td>${{ "%.2f"|format(item.unit_price) }}</td>
-
-                <td>${{ "%.2f"|format(item.line_total) }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No products have been added to this quote.</p>
-{% endif %}
-
-<h2>Total</h2>
-
-<p>
-    <strong>
-        {% if quote.total_price is not none %}
-            ${{ "%.2f"|format(quote.total_price) }}
-        {% else %}
-            $0.00
-        {% endif %}
-    </strong>
-</p>
-<p>
-    <a href="{{ url_for('quotes.edit_quote', quote_id=quote.id) }}">
-        Edit Quote
-    </a>
-</p>
-
-<p>
-    <a
-        href="{{ url_for('quotes.quote_pdf', quote_id=quote.id) }}"
-        target="_blank"
-    >
-        View PDF
-    </a>
-</p>
-
-<p>
-    <a href="{{ url_for('quotes.quote_list') }}">
-        Back to Quotes
-    </a>
-</p>
+<div class="quote-footer-note">
+    Product unit prices shown above are the prices recorded
+    when each item was added to this quotation.
+</div>
 
 {% endblock %}

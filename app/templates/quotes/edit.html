@@ -1,241 +1,356 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Quote {{ quote.id }}{% endblock %}
+{% block title %}
+Quote #{{ quote.id }} - Solar Quote Management System
+{% endblock %}
 
 {% block content %}
 
-<h1>Edit Quote #{{ quote.id }}</h1>
+<section class="page-header quote-detail-header">
 
-{% if errors %}
     <div>
-        <h3>Please fix the following:</h3>
 
-        <ul>
-            {% for error in errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
+        <div class="quote-title-row">
+
+            <p class="eyebrow">SOLAR QUOTATION</p>
+
+            <span class="status-badge status-{{ quote.status }}">
+                {{ quote.status|capitalize }}
+            </span>
+
+        </div>
+
+        <h1>Quote #{{ quote.id }}</h1>
+
+        <p class="page-subtitle">
+            Created {{ quote.created_at.strftime("%d %B %Y at %H:%M") }}
+        </p>
+
     </div>
-{% endif %}
 
-<form method="POST">
 
-    <h2>Customer</h2>
+    <div class="page-actions">
 
-    <p>
-        <label for="customer_id">
-            Customer
-        </label>
-
-        <select
-            id="customer_id"
-            name="customer_id"
-            required
+        <a
+            href="{{ url_for('quotes.quote_list') }}"
+            class="btn btn-outline"
         >
-            {% for customer in customers %}
-                {% set selected_customer_id =
-                    form_data.get(
-                        "customer_id",
-                        quote.customer_id|string
-                    )
-                %}
+            ← Quotes
+        </a>
 
-                <option
-                    value="{{ customer.id }}"
-                    {% if selected_customer_id == customer.id|string %}
-                        selected
+        <a
+            href="{{ url_for('quotes.edit_quote', quote_id=quote.id) }}"
+            class="btn btn-outline"
+        >
+            Edit Quote
+        </a>
+
+        <a
+            href="{{ url_for('quotes.quote_pdf', quote_id=quote.id) }}"
+            target="_blank"
+            class="btn btn-primary"
+        >
+            View PDF
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- Quote Overview -->
+<div class="quote-overview-grid">
+
+    <!-- Customer -->
+    <section class="content-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Customer</h2>
+                <p>Quotation recipient.</p>
+            </div>
+
+        </div>
+
+
+        <div class="detail-content">
+
+            <div class="profile-summary">
+
+                <div class="avatar avatar-large">
+                    {{ quote.customer.first_name[0] }}
+                    {{ quote.customer.last_name[0] }}
+                </div>
+
+                <div>
+
+                    <h3>
+                        {{ quote.customer.first_name }}
+                        {{ quote.customer.last_name }}
+                    </h3>
+
+                    <p>
+                        Customer #{{ quote.customer.id }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <dl class="detail-list">
+
+                <div class="detail-row">
+                    <dt>Email</dt>
+                    <dd>{{ quote.customer.email }}</dd>
+                </div>
+
+                <div class="detail-row">
+                    <dt>Phone</dt>
+                    <dd>{{ quote.customer.phone }}</dd>
+                </div>
+
+            </dl>
+
+        </div>
+
+    </section>
+
+
+    <!-- System -->
+    <section class="content-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>System Configuration</h2>
+                <p>Solar and battery capacity.</p>
+            </div>
+
+        </div>
+
+
+        <div class="system-metrics">
+
+            <div class="system-metric">
+
+                <span class="metric-label">
+                    SOLAR SYSTEM
+                </span>
+
+                <strong>
+                    {{ quote.system_size }}
+                    <small>kW</small>
+                </strong>
+
+            </div>
+
+
+            <div class="system-metric">
+
+                <span class="metric-label">
+                    BATTERY
+                </span>
+
+                <strong>
+
+                    {% if quote.battery_size is not none %}
+                        {{ quote.battery_size }}
+                        <small>kWh</small>
+                    {% else %}
+                        <span class="metric-none">None</span>
                     {% endif %}
-                >
-                    {{ customer.first_name }}
-                    {{ customer.last_name }}
-                    — {{ customer.email }}
-                </option>
-            {% endfor %}
-        </select>
-    </p>
 
-    <h2>System Information</h2>
+                </strong>
 
-    <p>
-        <label for="system_size">
-            System Size (kW)
-        </label>
+            </div>
 
-        <input
-            type="number"
-            id="system_size"
-            name="system_size"
-            step="0.01"
-            min="0.01"
-            value="{{ form_data.get(
-                'system_size',
-                quote.system_size
-            ) }}"
-            required
-        >
-    </p>
+        </div>
 
-    <p>
-        <label for="battery_size">
-            Battery Size (kWh)
-        </label>
+    </section>
 
-        <input
-            type="number"
-            id="battery_size"
-            name="battery_size"
-            step="0.01"
-            min="0"
-            value="{{ form_data.get(
-                'battery_size',
-                quote.battery_size if quote.battery_size is not none else ''
-            ) }}"
-        >
-    </p>
 
-    <h2>Status</h2>
+    <!-- Total -->
+    <section class="quote-total-card">
 
-    {% set selected_status =
-        form_data.get("status", quote.status)
-    %}
+        <span class="quote-total-label">
+            QUOTE TOTAL
+        </span>
 
-    <p>
-        <select
-            id="status"
-            name="status"
-            required
-        >
-            <option
-                value="draft"
-                {% if selected_status == "draft" %}selected{% endif %}
-            >
-                Draft
-            </option>
+        <div class="quote-total-value">
 
-            <option
-                value="sent"
-                {% if selected_status == "sent" %}selected{% endif %}
-            >
-                Sent
-            </option>
+            {% if quote.total_price is not none %}
+                ${{ "%.2f"|format(quote.total_price) }}
+            {% else %}
+                $0.00
+            {% endif %}
 
-            <option
-                value="accepted"
-                {% if selected_status == "accepted" %}selected{% endif %}
-            >
-                Accepted
-            </option>
+        </div>
 
-            <option
-                value="rejected"
-                {% if selected_status == "rejected" %}selected{% endif %}
-            >
-                Rejected
-            </option>
-        </select>
-    </p>
+        <span class="quote-total-caption">
+            Total quoted system price
+        </span>
 
-    <h2>Products</h2>
+    </section>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Status</th>
-                <th>Quote Unit Price</th>
-                <th>Quantity</th>
-            </tr>
-        </thead>
+</div>
 
-        <tbody>
-            {% for product in products %}
 
-                {% set existing_item =
-                    existing_items.get(product.id)
-                %}
+<!-- Quote Items -->
+<section class="content-card quote-items-card">
 
-                {% if existing_item %}
-                    {% set displayed_price =
-                        existing_item.unit_price
-                    %}
+    <div class="card-header">
+
+        <div>
+            <h2>Quote Items</h2>
+
+            <p>
+                Products and prices recorded for this quotation.
+            </p>
+        </div>
+
+    </div>
+
+
+    {% if quote.items %}
+
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Line Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in quote.items %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="product-name-cell">
+
+                                    <div class="product-icon">
+
+                                        {% if item.product.category == "panel" %}
+                                            ☀
+                                        {% elif item.product.category == "inverter" %}
+                                            ⚡
+                                        {% elif item.product.category == "battery" %}
+                                            ▣
+                                        {% else %}
+                                            •
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ item.product.brand }}
+                                            {{ item.product.model }}
+                                        </strong>
+
+                                        <div class="table-secondary">
+                                            {{ item.product.name }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="category-badge">
+
+                                    {% if item.product.category == "panel" %}
+                                        Solar Panel
+                                    {% elif item.product.category == "inverter" %}
+                                        Inverter
+                                    {% elif item.product.category == "battery" %}
+                                        Battery
+                                    {% else %}
+                                        {{ item.product.category|capitalize }}
+                                    {% endif %}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ item.quantity }}
+                            </td>
+
+
+                            <td class="price-cell">
+                                ${{ "%.2f"|format(item.unit_price) }}
+                            </td>
+
+
+                            <td class="price-cell">
+                                ${{ "%.2f"|format(item.line_total) }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="quote-items-total">
+
+            <span>Total</span>
+
+            <strong>
+
+                {% if quote.total_price is not none %}
+                    ${{ "%.2f"|format(quote.total_price) }}
                 {% else %}
-                    {% set displayed_price =
-                        product.unit_price
-                    %}
+                    $0.00
                 {% endif %}
 
-                <tr>
-                    <td>
-                        {{ product.brand }}
-                        {{ product.model }}
-                    </td>
+            </strong>
 
-                    <td>
-                        {{ product.category }}
-                    </td>
+        </div>
 
-                    <td>
-                        {% if product.is_active %}
-                            Active
-                        {% else %}
-                            Inactive
-                        {% endif %}
-                    </td>
+    {% else %}
 
-                    <td>
-                        ${{ "%.2f"|format(displayed_price) }}
-                    </td>
+        <div class="empty-state">
 
-                    <td>
-                        {% if form_data %}
-                            {% set quantity_value =
-                                form_data.get(
-                                    'quantity_' ~ product.id,
-                                    '0'
-                                )
-                            %}
-                        {% elif existing_item %}
-                            {% set quantity_value =
-                                existing_item.quantity
-                            %}
-                        {% else %}
-                            {% set quantity_value = 0 %}
-                        {% endif %}
+            <h3>No quote items</h3>
 
-                        <input
-                            type="number"
-                            name="quantity_{{ product.id }}"
-                            min="0"
-                            step="1"
-                            value="{{ quantity_value }}"
-                        >
-                    </td>
-                </tr>
+            <p>
+                No products have been added to this quotation.
+            </p>
 
-            {% endfor %}
-        </tbody>
-    </table>
+        </div>
 
-    <p>
-        Quantity 0 removes a product from the quote.
-    </p>
+    {% endif %}
 
-    <p>
-        <button type="submit">
-            Save Changes
-        </button>
-    </p>
+</section>
 
-</form>
 
-<p>
-    <a href="{{ url_for(
-        'quotes.quote_detail',
-        quote_id=quote.id
-    ) }}">
-        Cancel
-    </a>
-</p>
+<div class="quote-footer-note">
+    Product unit prices shown above are the prices recorded
+    when each item was added to this quotation.
+</div>
 
 {% endblock %}

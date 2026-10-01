@@ -1,10 +1,205 @@
 {% extends "base.html" %}
 
 {% block title %}
-Home - Solar Quote Management System
+Dashboard - Solar Quote Management System
 {% endblock %}
 
 {% block content %}
+
+{% if current_user.is_authenticated %}
+
+<section class="page-header">
+    <div>
+        <p class="eyebrow">WELCOME BACK</p>
+        <h1>Dashboard</h1>
+        <p class="page-subtitle">
+            Manage customers, products and solar quotations from one place.
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('quotes.create_quote') }}"
+        class="btn btn-primary"
+    >
+        + Create Quote
+    </a>
+</section>
+
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">Customers</div>
+        <div class="stat-value">{{ total_customers }}</div>
+        <a
+            href="{{ url_for('customers.customer_list') }}"
+            class="stat-link"
+        >
+            View customers →
+        </a>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Products</div>
+        <div class="stat-value">{{ total_products }}</div>
+        <a
+            href="{{ url_for('products.list_products') }}"
+            class="stat-link"
+        >
+            View products →
+        </a>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Total Quotes</div>
+        <div class="stat-value">{{ total_quotes }}</div>
+        <a
+            href="{{ url_for('quotes.quote_list') }}"
+            class="stat-link"
+        >
+            View quotes →
+        </a>
+    </div>
+
+    <div class="stat-card stat-card-accent">
+        <div class="stat-label">Accepted Quotes</div>
+        <div class="stat-value">{{ accepted_quotes }}</div>
+        <span class="stat-caption">
+            Successfully accepted
+        </span>
+    </div>
+
+</section>
+
+
+<section class="content-card">
+
+    <div class="card-header">
+        <div>
+            <h2>Recent Quotes</h2>
+            <p>Latest quotations created in the system.</p>
+        </div>
+
+        <a
+            href="{{ url_for('quotes.quote_list') }}"
+            class="text-link"
+        >
+            View all quotes →
+        </a>
+    </div>
+
+
+    {% if recent_quotes %}
+
+    <div class="table-wrapper">
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Quote</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>System Size</th>
+                    <th>Total</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for quote in recent_quotes %}
+                <tr>
+
+                    <td>
+                        <strong>#{{ quote.id }}</strong>
+                    </td>
+
+                    <td>
+                        {{ quote.customer.first_name }}
+                        {{ quote.customer.last_name }}
+                    </td>
+
+                    <td>
+                        <span class="status-badge status-{{ quote.status }}">
+                            {{ quote.status|capitalize }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ quote.system_size }} kW
+                    </td>
+
+                    <td class="price-cell">
+                        {% if quote.total_price is not none %}
+                            ${{ "%.2f"|format(quote.total_price) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ quote.created_at.strftime("%d %b %Y") }}
+                    </td>
+
+                    <td class="table-action">
+                        <a
+                            href="{{ url_for('quotes.quote_detail', quote_id=quote.id) }}"
+                            class="text-link"
+                        >
+                            View
+                        </a>
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+        <h3>No quotes yet</h3>
+        <p>Create your first solar quotation to get started.</p>
+
+        <a
+            href="{{ url_for('quotes.create_quote') }}"
+            class="btn btn-primary"
+        >
+            Create Quote
+        </a>
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+{% else %}
+
+<section class="welcome-panel">
+
+    <p class="eyebrow">TRS SOLAR</p>
+
     <h1>Solar Quote Management System</h1>
-    <p>Welcome to the Solar Quote Management System.</p>
+
+    <p>
+        A streamlined platform for managing customers,
+        solar products and professional quotations.
+    </p>
+
+    <a
+        href="{{ url_for('auth.login') }}"
+        class="btn btn-primary"
+    >
+        Login to Continue
+    </a>
+
+</section>
+
+{% endif %}
+
 {% endblock %}
