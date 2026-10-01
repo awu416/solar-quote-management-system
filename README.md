@@ -2,6 +2,8 @@
 
 A full-stack web application for managing customers, solar products, quotations, pricing, and professional PDF quote generation.
 
+![Solar Quote Management System Dashboard](docs/screenshots/dashboard.png)
+
 The system was designed around a practical solar sales workflow, allowing users to maintain a product catalogue, create customer quotations, preserve historical pricing, manage quote statuses, and generate professional PDF proposals from a central application.
 
 ---
@@ -123,6 +125,41 @@ PDF documents are generated server-side using ReportLab.
 The application includes authenticated access using Flask-Login.
 
 Protected application routes require the user to sign in before accessing customer, product, and quotation management functionality.
+
+---
+
+
+## Screenshots
+
+### Dashboard
+
+A central overview of customers, products, quotation activity, and recently created quotes.
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Customer Management
+
+Customer records and quotation history can be managed from a dedicated customer directory.
+
+![Customer Management](docs/screenshots/customers.png)
+
+### Product Catalogue
+
+Solar panels, inverters, batteries, catalogue pricing, and product availability are managed through the product catalogue.
+
+![Product Catalogue](docs/screenshots/products.png)
+
+### Quote Management
+
+Each quotation combines customer information, solar system configuration, product quantities, snapshot pricing, and automatically calculated totals.
+
+![Quote Detail](docs/screenshots/quote-detail.png)
+
+### PDF Quotation
+
+The application generates branded PDF quotations suitable for presenting solar system details and pricing to customers.
+
+![Generated PDF Quote](docs/screenshots/quote-pdf.png)
 
 ---
 
